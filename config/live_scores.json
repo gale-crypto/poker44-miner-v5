@@ -1,0 +1,33 @@
+[
+  {
+    "competition_round": "Competition 7 R1",
+    "recorded_at": "2026-07-27",
+    "live_score": 0.5345,
+    "excess_over_floor": 0.0095,
+    "zeroed": false,
+    "variant": "v5-rank-ensemble",
+    "model_version": "unknown (pre-identity build)",
+    "artifact_sha256": "79431dcf5a395ab07e661cd3af6bd682ebe4361939e2c2e73459ae9da97efa46",
+    "feature_schema_sha256": "unknown (pre-identity build)",
+    "config": {
+      "scale_norm": false,
+      "drift_policy": false,
+      "amount_bucket_fixed": false,
+      "positive_floor": false,
+      "positive_fraction": 0.05,
+      "deploy_threshold": 0.5651488129704689
+    },
+    "offline_reward": null,
+    "reward_formula_version": "0.35*AP + 0.30*recall@fpr<=0.05 + 0.20*tsq + 0.10*tsq + 0.05",
+    "source": "user-reported Poker44 leaderboard",
+    "round_context": {
+      "super_poker_3": 0.6904,
+      "Travis861-Poker44_v2": 0.66,
+      "p44-artos-v1": 0.657,
+      "Poker44-cold-poker1": 0.6225,
+      "poker44-miner-v5": 0.5345,
+      "poker44-miner-v4": 0.5289
+    },
+    "diagnosis": "A no-signal model scores 0.525, so this build had essentially no live discrimination (implied AP ~0.53) while four peers ran at AP 0.62-0.70. Baseline for the scale-normalization, drift-policy, amount-bucket and positive-floor changes. Context only - never a per-example training label."
+  }
+]

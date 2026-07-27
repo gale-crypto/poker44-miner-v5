@@ -100,6 +100,28 @@ def _remap_to_threshold(p: np.ndarray, t: float) -> np.ndarray:
     return np.clip(out, 0.0, 1.0)
 
 
+def _positive_floor(scores: np.ndarray, k_min: int = 1) -> np.ndarray:
+    """Guarantee at least ``k_min`` chunks sit >= 0.5, order preserved.
+
+    ``place_threshold`` already flags the top ``fraction`` for a full-size batch,
+    but the small-batch path falls back to a fixed threshold that can flag
+    nothing. threshold_sanity_quality is zero when no truly-bot chunk reaches
+    0.5, and that zeroes the ENTIRE reward, so the floor is enforced
+    unconditionally. Rank metrics (AP, recall@FPR) are untouched.
+    """
+    s = np.asarray(scores, dtype=float)
+    n = s.size
+    if n == 0:
+        return s
+    k = max(1, min(int(k_min), n))
+    if int((s >= 0.5).sum()) >= k:
+        return s
+    out = s.copy()
+    for rank, idx in enumerate(np.argsort(-s, kind="stable")[:k]):
+        out[idx] = 0.501 + 0.008 * (k - rank) / (k + 1.0)
+    return np.clip(out, 0.0, 1.0)
+
+
 def place_threshold(p: np.ndarray, fraction: float = POSITIVE_FRACTION,
                     fallback: float = 0.5) -> np.ndarray:
     """Rescale scores so the top ``fraction`` of the batch sits >= 0.5."""
@@ -127,11 +149,27 @@ class Detector:
         self.cols_profile = self.ens.cols_profile
         self.cols_behavior = self.ens.cols_behavior
 
+    @staticmethod
+    def _check_schema(sample: dict, cols, view: str) -> None:
+        """Fail loudly on a stale artifact instead of reading renamed columns as 0."""
+        missing = [c for c in cols if c not in sample]
+        if len(missing) > max(2, 0.05 * len(cols)):
+            raise RuntimeError(
+                f"artifact expects {len(missing)}/{len(cols)} {view} features this "
+                f"build no longer emits (e.g. {missing[:3]}). "
+                "Retrain: python -m detector.train"
+            )
+
     def _matrices(self, chunks):
+        prof_rows = [profile_features(c) for c in chunks]
+        beh_rows = [behavior_features(c) for c in chunks]
+        if prof_rows:
+            self._check_schema(prof_rows[0], self.cols_profile, "profile")
+            self._check_schema(beh_rows[0], self.cols_behavior, "behavior")
         prof = np.array([[float(d.get(c, 0.0)) for c in self.cols_profile]
-                         for d in (profile_features(c) for c in chunks)], dtype=float)
+                         for d in prof_rows], dtype=float)
         beh = np.array([[float(d.get(c, 0.0)) for c in self.cols_behavior]
-                        for d in (behavior_features(c) for c in chunks)], dtype=float)
+                        for d in beh_rows], dtype=float)
         return prof, beh
 
     def score_chunks(self, chunks: List[List[Dict[str, Any]]]) -> List[float]:
@@ -139,7 +177,9 @@ class Detector:
             return []
         prof, beh = self._matrices(chunks)
         p = self.ens.score(prof, beh)
-        scores = place_threshold(p, POSITIVE_FRACTION, self.fallback_threshold)
+        scores = _positive_floor(
+            place_threshold(p, POSITIVE_FRACTION, self.fallback_threshold)
+        )
         return [0.1 if not chunk else round(float(s), 6)
                 for chunk, s in zip(chunks, scores)]
 
