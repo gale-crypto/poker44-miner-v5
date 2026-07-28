@@ -29,5 +29,29 @@
       "poker44-miner-v4": 0.5289
     },
     "diagnosis": "A no-signal model scores 0.525, so this build had essentially no live discrimination (implied AP ~0.53) while four peers ran at AP 0.62-0.70. Baseline for the scale-normalization, drift-policy, amount-bucket and positive-floor changes. Context only - never a per-example training label."
+  },
+  {
+    "competition_round": "Competition 7 R2",
+    "recorded_at": "2026-07-28",
+    "live_score": 0.5597,
+    "excess_over_floor": 0.0347,
+    "zeroed": false,
+    "variant": "v5-rank-ensemble",
+    "model_version": "20260727-065819",
+    "artifact_sha256": "e5c51be99c687750e688d638e979c99ec52f8e74f46c00bf0ddca0621f0d9195",
+    "feature_schema_sha256": "44f976e637a624080edd518fba2e94d333057295bf5be123907f3bcd869ffdef",
+    "config": {
+      "scale_norm": true,
+      "drift_policy": null,
+      "amount_bucket_fixed": true,
+      "positive_floor": true,
+      "max_pos_frac": null,
+      "positive_fraction": 0.05,
+      "sig_weight": null
+    },
+    "offline_reward": 0.9162050321739116,
+    "reward_formula_version": "0.35*AP + 0.30*recall@fpr<=0.05 + 0.20*tsq + 0.10*tsq + 0.05",
+    "source": "user-reported Poker44 leaderboard",
+    "diagnosis": "First round on the transfer-fix build. Round 1 was 0.5345 = floor+0.0095; this is floor+0.0347. v4 moved further (+0.0475 vs +0.0252) despite v4 compressing its live scores into a 0.007 band."
   }
 ]
