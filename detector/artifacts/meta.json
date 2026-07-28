@@ -1,10 +1,10 @@
 {
   "model": "Poker44 behavioural bot detector",
   "variant": "v5-rank-ensemble",
-  "model_version": "20260727-065819",
-  "trained_at_utc": "2026-07-27T06:58:19Z",
-  "artifact_sha256": "e5c51be99c687750e688d638e979c99ec52f8e74f46c00bf0ddca0621f0d9195",
-  "deploy_threshold": 0.5843196294151708,
+  "model_version": "20260728-072955",
+  "trained_at_utc": "2026-07-28T07:29:55Z",
+  "artifact_sha256": "1d916be34ff645422b682136164e2971b644a5211c1a0dc659abdba58588adb7",
+  "deploy_threshold": 0.5560233440326817,
   "positive_fraction": 0.05,
   "feature_count": {
     "profile": 236,
@@ -106,8 +106,8 @@
   },
   "walk_forward": {
     "points": 3,
-    "reward": 0.9162050321739116,
-    "ap": 0.9603436754605708
+    "reward": 0.9552998322574083,
+    "ap": 0.9766330611081231
   },
   "train_dates": [
     "2026-05-26",
@@ -171,6 +171,8 @@
     "2026-07-23",
     "2026-07-24",
     "2026-07-25",
-    "2026-07-26"
+    "2026-07-26",
+    "2026-07-27",
+    "2026-07-28"
   ]
 }
